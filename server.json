@@ -1,0 +1,23 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.centricai/arvx",
+  "title": "ARVX",
+  "description": "Email for long-term client relationships: ARVX reads each person first and remembers every pair.",
+  "websiteUrl": "https://developer.arvx.ai/",
+  "repository": { "url": "https://github.com/centricai/arvx-mcp", "source": "github" },
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.arvx.ai/mcp",
+      "headers": [
+        {
+          "name": "x-arvx-key",
+          "description": "Your ARVX key. A person creates it at https://api.arvx.ai/account.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

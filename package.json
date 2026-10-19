@@ -1,0 +1,19 @@
+{
+  "name": "arvx-mcp",
+  "version": "1.0.0",
+  "description": "ARVX connector for AI agents: run ARVX Readings from any MCP-compatible assistant. Keeps nothing.",
+  "type": "commonjs",
+  "main": "http.js",
+  "scripts": {
+    "start": "node http.js",
+    "test": "node test.js"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "express": "4.22.3",
+    "zod": "3.25.76"
+  },
+  "license": "Apache-2.0",
+  "private": true
+}
