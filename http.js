@@ -15,7 +15,8 @@ app.disable("x-powered-by");
 // A Reading can carry up to 200 emails of up to 20,000 characters each.
 app.use(express.json({ limit: "5mb" }));
 
-app.get("/healthz", (_req, res) => res.status(200).json({ status: "ok", service: "arvx-mcp", version: VERSION }));
+// Cloud Run keeps paths ending in "z" for itself, so the health address is /health.
+app.get("/health", (_req, res) => res.status(200).json({ status: "ok", service: "arvx-mcp", version: VERSION }));
 
 app.get("/", (_req, res) =>
   res.status(200).json({
