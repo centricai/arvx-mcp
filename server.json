@@ -2,10 +2,10 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "ai.arvx/arvx",
   "title": "ARVX",
-  "description": "ARVX™ models both people in a relationship and recalculates its health score with every Reading.",
+  "description": "ARVX™ models both people in a relationship and reads its health area by area with every Reading.",
   "websiteUrl": "https://developer.arvx.ai/",
   "repository": { "url": "https://github.com/centricai/arvx-mcp", "source": "github" },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "remotes": [
     {
       "type": "streamable-http",

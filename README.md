@@ -1,6 +1,6 @@
 # ARVX connector
 
-ARVX™ models both people in a relationship and recalculates its health score with every Reading.
+ARVX™ models both people in a relationship and reads its health area by area with every Reading.
 
 Building a CRM or an email tool? ARVX is the bridge between your product and the email client. It reads each person first, knows their normal, and remembers every pair.
 
