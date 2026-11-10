@@ -1,6 +1,6 @@
 # ARVX connector
 
-Email for long-term client relationships: ARVX reads each person first and remembers every pair.
+ARVX™ models both people in a relationship and recalculates its health score with every Reading.
 
 Building a CRM or an email tool? ARVX is the bridge between your product and the email client. It reads each person first, knows their normal, and remembers every pair.
 
