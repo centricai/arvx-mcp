@@ -5,7 +5,7 @@
  * own headers; the key is passed to api.arvx.ai and never stored, logged or
  * returned. Refusals from ARVX are passed on word for word.
  */
-const { McpServer } = require("@modelcontextprotocol/sdk/server/mcp.js");
+const { McpServer } = require("@modelcontextprotocol/server");
 const { z } = require("zod");
 
 const VERSION = "1.0.0";
@@ -133,11 +133,13 @@ async function callArvx(key, path, body) {
 function buildServer(key) {
   const server = new McpServer({ name: "arvx", version: VERSION }, { instructions: INSTRUCTIONS });
 
-  server.tool(
+  server.registerTool(
     "arvx_get_access",
-    "How to get access to ARVX: the signup link to give the person, what they must do themselves, the price, and how to add their key to this connector. Call this when there is no key, or when the person asks how to start. Costs nothing.",
-    {},
-    { readOnlyHint: true, openWorldHint: false },
+    {
+      description: "How to get access to ARVX: the signup link to give the person, what they must do themselves, the price, and how to add their key to this connector. Call this when there is no key, or when the person asks how to start. Costs nothing.",
+      inputSchema: {},
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async () =>
       text({
         signupLink: SIGNUP_URL,
@@ -150,16 +152,18 @@ function buildServer(key) {
       })
   );
 
-  server.tool(
+  server.registerTool(
     "arvx_run_reading",
-    "Run a Reading on two people from the emails between them. Send at least 3 emails written by the user and 3 by the other person, oldest first. From the second Reading on a pair, send the record from the last Reading exactly as it was returned. Costs one Reading (the first 3 are free). Save the record from the answer with this pair.",
     {
-      user: User,
-      other: Other,
-      emails: z.array(Email).min(1).max(200).describe("Oldest first. Each person is read from their own latest 20 emails, the first 3,000 characters of each."),
-      record: z.string().optional().describe("The record from the last Reading on these same two people, unchanged. Leave out on the first Reading."),
+      description: "Run a Reading on two people from the emails between them. Send at least 3 emails written by the user and 3 by the other person, oldest first. From the second Reading on a pair, send the record from the last Reading exactly as it was returned. Costs one Reading (the first 3 are free). Save the record from the answer with this pair.",
+      inputSchema: {
+        user: User,
+        other: Other,
+        emails: z.array(Email).min(1).max(200).describe("Oldest first. Each person is read from their own latest 20 emails, the first 3,000 characters of each."),
+        record: z.string().optional().describe("The record from the last Reading on these same two people, unchanged. Leave out on the first Reading."),
+      },
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     },
-    { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     async (args) => {
       if (!key) return refusal(NO_KEY);
       const r = await callArvx(key, "/v1/readings/two-person-fit", args);
@@ -171,16 +175,18 @@ function buildServer(key) {
     }
   );
 
-  server.tool(
+  server.registerTool(
     "arvx_record_summary",
-    "When someone asks what is held about them: returns every item in a saved record in plain words. Needs the record and both people's emails. Never uses up a Reading; 10 a month per account.",
     {
-      record: z.string(),
-      user: z.object({ email: z.string().email() }),
-      other: z.object({ email: z.string().email() }),
-      reason: z.enum(["access_request", "correction", "deletion_check"]),
+      description: "When someone asks what is held about them: returns every item in a saved record in plain words. Needs the record and both people's emails. Never uses up a Reading; 10 a month per account.",
+      inputSchema: {
+        record: z.string(),
+        user: z.object({ email: z.string().email() }),
+        other: z.object({ email: z.string().email() }),
+        reason: z.enum(["access_request", "correction", "deletion_check"]),
+      },
+      annotations: { readOnlyHint: true, openWorldHint: true },
     },
-    { readOnlyHint: true, openWorldHint: true },
     async (args) => {
       if (!key) return refusal(NO_KEY.replace("No Reading was counted.", "This summary was not counted."));
       const r = await callArvx(key, "/v1/records/summary", args);

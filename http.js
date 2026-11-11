@@ -7,7 +7,8 @@
  * Never logs a key, a request body or an answer.
  */
 const express = require("express");
-const { StreamableHTTPServerTransport } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
+const { createMcpHandler } = require("@modelcontextprotocol/server");
+const { toNodeHandler } = require("@modelcontextprotocol/node");
 const { buildServer, keyFrom, VERSION } = require("./tools.js");
 
 const app = express();
@@ -91,21 +92,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/mcp", async (req, res) => {
-  const server = buildServer(keyFrom(req.headers));
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-  res.on("close", () => {
-    transport.close();
-    server.close();
-  });
-  try {
-    await server.connect(transport);
-    await transport.handleRequest(req, res, req.body);
-  } catch (err) {
-    console.error("[arvx-mcp] request error:", err.name || "unknown");
-    if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "Internal server error" }, id: null });
-  }
-});
+// One handler serves both protocol eras from the same tools:
+// - MCP 2026-07-28 (stateless, per-request _meta, server/discover)
+// - 2025-era clients (initialize handshake), served statelessly as before.
+// The key is read from each request's own headers, so nothing is shared between requests.
+const mcp = createMcpHandler(
+  ({ requestInfo }) => buildServer(keyFrom(requestInfo ? Object.fromEntries(requestInfo.headers) : {})),
+  { onerror: (err) => console.error("[arvx-mcp] request error:", (err && err.name) || "unknown") }
+);
+const handleMcp = toNodeHandler(mcp, { onerror: (err) => console.error("[arvx-mcp] request error:", (err && err.name) || "unknown") });
+app.post("/mcp", (req, res) => handleMcp(req, res, req.body));
 
 const notAllowed = (_req, res) => res.status(405).json({ jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed." }, id: null });
 app.get("/mcp", (req, res) => (wantsPage(req) ? sendPage(res) : notAllowed(req, res)));
