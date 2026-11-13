@@ -2,7 +2,7 @@
 
 ARVX™ models both people in a relationship and reads its health area by area with every Reading.
 
-Building a CRM or an email tool? ARVX is the bridge between your product and the email client. It reads each person first, knows their normal, and remembers every pair.
+Building a CRM or an email tool? ARVX is the bridge between your product and the email client. It reads each person first, knows their normal, and follows each pair over time from a sealed record only you hold.
 
 This connector lets any MCP-compatible AI assistant or coding agent run ARVX Readings. It keeps nothing: your key travels with each request to ARVX and is never stored.
 
